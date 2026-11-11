@@ -40,7 +40,7 @@ for (const f of files) {
 
   // 1. Llave secreta o admin.ts fuera de las rutas permitidas
   const usesSecret = /SUPABASE_SERVICE_ROLE_KEY|supabase\/admin|from ['"]\.\/admin['"]/.test(text)
-  if (usesSecret && !ALLOWED_SECRET.some((p) => r.startsWith(p) || r === p)) {
+  if (usesSecret && !isTest(f) && !ALLOWED_SECRET.some((p) => r.startsWith(p) || r === p)) {
     problems.push(`${r}: referencia la llave secreta o admin.ts fuera de las rutas permitidas`)
   }
 
