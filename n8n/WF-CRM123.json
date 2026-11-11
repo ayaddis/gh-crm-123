@@ -1,0 +1,448 @@
+{
+  "name": "WF-CRM123",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 7 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Disparo programado",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crm123-resumen",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Disparo manual",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "crm123-resumen",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "CRM123 Webhook"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "mode",
+              "value": "scheduled",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "run_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "pwa_base_url",
+              "value": "https://REEMPLAZA-CON-LA-URL-DE-LA-PWA",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "contexto-programado",
+      "name": "Contexto programado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "mode",
+              "value": "manual",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "run_id",
+              "value": "={{ $json.body.run_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "pwa_base_url",
+              "value": "https://REEMPLAZA-CON-LA-URL-DE-LA-PWA",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "contexto-manual",
+      "name": "Contexto manual",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.pwa_base_url }}/api/n8n/summary-data",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "mode",
+              "value": "={{ $json.mode }}"
+            },
+            {
+              "name": "run_id",
+              "value": "={{ $json.run_id }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "fetch",
+      "name": "Obtener datos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        100
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "CRM123 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.skipped }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if",
+      "name": "¿Omitido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "noop",
+      "name": "Fin (omitido)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "id": "split",
+      "name": "Separar destinatarios",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        960,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// Arma el correo en español con estilos en línea. TODO texto dinámico se escapa.\nconst esc = (v) => String(v ?? '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[c]));\nconst mxn = (n) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(Number(n || 0));\nconst fecha = (d) => { const [y, m, day] = String(d).slice(0, 10).split('-'); return `${day}/${m}/${y}`; };\nconst wrap = (title, body) => `<div style=\"font-family:Arial,Helvetica,sans-serif;color:#0F172A;max-width:640px;margin:0 auto\"><div style=\"background:#1E3A8A;color:#fff;padding:14px 18px;font-size:18px;font-weight:700\">CRM-123</div><div style=\"padding:18px\"><h2 style=\"margin:0 0 12px;font-size:18px\">${esc(title)}</h2>${body}</div></div>`;\nconst section = (title, rows) => rows.length ? `<h3 style=\"font-size:15px;margin:18px 0 6px\">${esc(title)}</h3><ul style=\"padding-left:18px;margin:0\">${rows.map((r) => `<li style=\"margin:4px 0\">${r}</li>`).join('')}</ul>` : '';\n\nreturn $input.all().map((item) => {\n  const r = item.json;\n  const d = r.data || {};\n  let html;\n  if (r.kind === 'supervisor') {\n    const k = d.team_kpis || {};\n    const kpis = [\n      ['Pipeline abierto', `${esc(k.open_opportunities)} oportunidades · ${mxn(k.open_pipeline_premium)}`],\n      ['Ganado del mes', `${esc(k.won_count_month)} ganadas · ${mxn(k.won_premium_month)}`],\n      ['Recibos vencidos', esc(k.overdue_receipts)],\n      ['Renovaciones próximas', esc(k.upcoming_renewals)],\n      ['Siniestros abiertos', esc(k.open_claims)],\n      ['Seguimientos vencidos', esc(k.overdue_follow_ups)],\n    ].map(([a, b]) => `<tr><td style=\"padding:6px 8px;border-bottom:1px solid #E2E8F0\">${a}</td><td style=\"padding:6px 8px;border-bottom:1px solid #E2E8F0;text-align:right\"><b>${b}</b></td></tr>`).join('');\n    const rank = (d.ranking || []).map((s, i) => `<tr><td style=\"padding:6px 8px;border-bottom:1px solid #E2E8F0\">${i + 1}. ${esc(s.seller_name)}</td><td style=\"padding:6px 8px;border-bottom:1px solid #E2E8F0;text-align:right\">${mxn(s.won_premium_month)}${s.goal_premium_month ? ' de ' + mxn(s.goal_premium_month) : ''}</td></tr>`).join('');\n    html = wrap('Resumen del equipo', `<table style=\"width:100%;border-collapse:collapse;font-size:14px\">${kpis}</table><h3 style=\"font-size:15px;margin:18px 0 6px\">Ranking de vendedores del mes</h3><table style=\"width:100%;border-collapse:collapse;font-size:14px\">${rank || '<tr><td>Sin datos.</td></tr>'}</table>`);\n  } else {\n    const hoy = (d.follow_ups_today || []).map((f) => `<b>${esc(f.client_name)}</b> · ${esc(f.note || 'Sin nota')}`);\n    const venc = (d.follow_ups_overdue || []).map((f) => `<b>${esc(f.client_name)}</b> · ${fecha(f.due_date)} · ${esc(f.note || 'Sin nota')}`);\n    const rec = (d.receipts || []).map((x) => `Póliza <b>${esc(x.policy_number)}</b> · ${esc(x.client_name || 'Cliente reasignado')} · recibo ${esc(x.installment_number)} · ${fecha(x.due_date)} · ${mxn(x.amount)} · ${Number(x.days_to_due) < 0 ? 'vencido' : 'vence en ' + esc(x.days_to_due) + ' días'}`);\n    const ren = (d.renewals || []).map((x) => `Póliza <b>${esc(x.policy_number)}</b> · ${esc(x.client_name || 'Cliente reasignado')} · ${esc(x.product_name)} · termina ${fecha(x.end_date)} (${esc(x.days_to_end)} días)`);\n    const body = section('Seguimientos de hoy', hoy) + section('Seguimientos vencidos', venc) + section('Recibos vencidos o por vencer', rec) + section('Renovaciones próximas', ren);\n    html = wrap(`Hola, ${String(r.name || '').split(' ')[0]}`, body || '<p>Sin pendientes hoy.</p>');\n  }\n  return { json: { user_id: r.user_id, deliver_to: r.deliver_to, subject: r.subject, html } };\n});"
+      },
+      "id": "build",
+      "name": "Armar correo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $('Obtener datos').first().json.run_id }}-{{ $json.user_id }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: 'CRM-123 <' + $('Obtener datos').first().json.from_email + '>', to: [$json.deliver_to], subject: $json.subject, html: $json.html }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 700
+            }
+          }
+        }
+      },
+      "id": "send",
+      "name": "Enviar con Resend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        200
+      ],
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "",
+          "name": "Resend"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// Une cada respuesta de Resend con su destinatario (mismo orden que \"Armar correo\").\nconst built = $('Armar correo').all();\nconst data = $('Obtener datos').first().json;\nconst sent = [];\nconst failed = [];\n$input.all().forEach((item, i) => {\n  const user_id = built[i]?.json?.user_id;\n  if (!user_id) return;\n  if (item.json && item.json.id && !item.json.error) sent.push({ user_id, resend_id: String(item.json.id) });\n  else failed.push({ user_id, error: String((item.json && (item.json.error?.message || item.json.message || item.json.error)) || 'Error desconocido').slice(0, 200) });\n});\nreturn [{ json: { run_id: data.run_id, mode: data.mode, sent, failed } }];"
+      },
+      "id": "merge",
+      "name": "Consolidar resultado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($('Contexto manual').isExecuted ? $('Contexto manual').first().json.pwa_base_url : $('Contexto programado').first().json.pwa_base_url) + '/api/n8n/run-report' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "report",
+      "name": "Reportar a CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "CRM123 API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Disparo programado": {
+      "main": [
+        [
+          {
+            "node": "Contexto programado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo manual": {
+      "main": [
+        [
+          {
+            "node": "Contexto manual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto programado": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contexto manual": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener datos": {
+      "main": [
+        [
+          {
+            "node": "¿Omitido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Omitido?": {
+      "main": [
+        [
+          {
+            "node": "Fin (omitido)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Separar destinatarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar destinatarios": {
+      "main": [
+        [
+          {
+            "node": "Armar correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar correo": {
+      "main": [
+        [
+          {
+            "node": "Enviar con Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar con Resend": {
+      "main": [
+        [
+          {
+            "node": "Consolidar resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar resultado": {
+      "main": [
+        [
+          {
+            "node": "Reportar a CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Mexico_City"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

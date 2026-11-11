@@ -27,3 +27,21 @@ export function formatTodayMx(now: Date = new Date()): string {
 export function greetingName(fullName: string): string {
   return fullName.trim().split(/\s+/)[0] ?? fullName
 }
+
+/** Hoy en Ciudad de México como 'YYYY-MM-DD'. */
+export function todayMxIso(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+}
+
+export function formatPct(value: number): string {
+  return `${value.toFixed(2)} %`
+}
+
+/** Suma días a 'YYYY-MM-DD' (sin zona horaria). */
+export function addDays(date: string, days: number): string {
+  const [y, m, d] = date.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d + days))
+  return dt.toISOString().slice(0, 10)
+}
+
+export const REASSIGNED = 'Cliente reasignado'

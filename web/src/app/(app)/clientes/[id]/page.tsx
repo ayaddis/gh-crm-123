@@ -17,6 +17,8 @@ import { archiveClient, updateClient } from '../../_actions/clients'
 import { addActivity } from '../../_actions/activities'
 import { cancelFollowUp, completeFollowUp, createFollowUp } from '../../_actions/follow-ups'
 import { createOpportunity } from '../../_actions/opportunities'
+import { reassignClient } from '../../_actions/reassign'
+import { SelectField } from '@/components/field'
 
 const TABS = [
   ['resumen', 'Resumen'], ['oportunidades', 'Oportunidades'], ['polizas', 'Pólizas'], ['actividad', 'Actividad'], ['seguimientos', 'Seguimientos'],
@@ -35,6 +37,7 @@ export default async function FichaPage({ params, searchParams }: { params: Prom
   if (error) return <ErrorNotice />
   if (!client) notFound()
 
+  const people = profile.role === 'supervisor' ? ((await supabase.from('profiles').select('id, full_name').eq('is_active', true).order('full_name')).data ?? []) : []
   const [opps, policies, acts, fups, products, owner] = await Promise.all([
     supabase.from('opportunities').select('id, stage, estimated_annual_premium, estimated_close_date, archived_at, products(name)').eq('client_id', id).order('created_at', { ascending: false }),
     supabase.from('v_policies').select('id, policy_number, product_name, insurer_name, annual_premium, start_date, end_date, effective_status').eq('client_id', id).order('created_at', { ascending: false }),
@@ -74,6 +77,13 @@ export default async function FichaPage({ params, searchParams }: { params: Prom
               <FormModal title="Editar cliente" triggerLabel="Editar" triggerVariant="outline" kind="drawer" action={updateClient} submitLabel="Guardar" pendingLabel="Guardando…">
                 <input type="hidden" name="id" value={id} /><ClientFields client={client} />
               </FormModal>
+              {profile.role === 'supervisor' && (
+                <FormModal title="Reasignar cliente" triggerLabel="Reasignar" triggerVariant="outline" action={reassignClient} submitLabel="Reasignar" pendingLabel="Reasignando…">
+                  <input type="hidden" name="client_id" value={id} />
+                  <SelectField label="Nuevo responsable" name="new_owner_id" placeholder="Selecciona…" options={people.filter((p) => p.id !== client.owner_id).map((p) => ({ value: p.id, text: p.full_name }))} required />
+                  <p className="rounded-md bg-warn-bg px-3 py-2 text-xs text-warn-fg">Se moverán también sus oportunidades, seguimientos pendientes y pólizas vigentes. Las comisiones ya generadas conservan a su ejecutivo original.</p>
+                </FormModal>
+              )}
               <FormModal title="Archivar cliente" triggerLabel="Archivar" triggerVariant="outline" action={archiveClient} submitLabel="Archivar" pendingLabel="Archivando…">
                 <input type="hidden" name="id" value={id} />
                 <p className="text-sm">El cliente dejará de aparecer en la lista principal. Podrás verlo activando el filtro “Archivados”.</p>

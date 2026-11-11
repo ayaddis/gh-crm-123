@@ -1,10 +1,10 @@
 import { Screen } from '@/components/layout/screen'
-import { ComingSoon } from '@/components/coming-soon'
+import { SummaryPanel } from '@/components/summary/summary-panel'
 
-export default function Page() {
+export default function ResumenPage() {
   return (
-    <Screen title="Resumen">
-      <ComingSoon />
+    <Screen title="Resumen matutino">
+      <SummaryPanel />
     </Screen>
   )
 }
