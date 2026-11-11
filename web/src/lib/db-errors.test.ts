@@ -5,6 +5,8 @@ describe('mapDbError', () => {
   it('teléfono repetido', () =>
     expect(mapDbError({ code: '23505', message: 'duplicate key value violates unique constraint "clients_phone_key"' })).toBe(
       'Ya existe un cliente con ese teléfono. Consulta con tu supervisor.'))
+  it('nombre repetido en catálogo', () =>
+    expect(mapDbError({ code: '23505', message: 'violates unique constraint "insurers_name_key"' })).toBe('Ya existe un registro con ese nombre.'))
   it('permiso', () => expect(mapDbError({ code: '42501' })).toBe('No tienes permiso para esta acción.'))
   it('regla de negocio', () => expect(mapDbError({ code: 'P0001', message: 'Mensaje en español' })).toBe('Mensaje en español'))
   it('genérico', () => expect(mapDbError({ code: 'XX000' })).toBe('Ocurrió un error. Intenta de nuevo.'))
