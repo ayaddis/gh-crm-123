@@ -110,7 +110,8 @@ export function SummaryPanel() {
       setCooldown(Number(data.retry_after_s ?? 0))
       return setMessage({ kind: 'error', text: 'Espera unos segundos antes de enviar otro resumen.' })
     }
-    setMessage({ kind: 'error', text: res.status === 409 ? 'Ya hay un envío en proceso.' : 'El envío no se pudo iniciar. Intenta de nuevo.' })
+    const hint = typeof data.n8n_status === 'number' ? ` (n8n respondió ${data.n8n_status})` : typeof data.n8n_error === 'string' ? ` (${data.n8n_error})` : ''
+    setMessage({ kind: 'error', text: res.status === 409 ? 'Ya hay un envío en proceso.' : `El envío no se pudo iniciar. Intenta de nuevo.${hint}` })
   }
 
   if (loadError && !status) return <ErrorNotice />

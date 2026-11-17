@@ -67,11 +67,13 @@ export async function POST(request: NextRequest) {
     })
     if (!res.ok) {
       console.error('summary/trigger: n8n respondió', res.status)
-      return json({ error: 'El envío no se pudo iniciar. Intenta de nuevo.' }, 502)
+      return json({ error: 'El envío no se pudo iniciar. Intenta de nuevo.', n8n_status: res.status }, 502)
     }
   } catch (e) {
-    console.error('summary/trigger: fallo al llamar a n8n', e instanceof Error ? e.name : 'error')
-    return json({ error: 'El envío no se pudo iniciar. Intenta de nuevo.' }, 502)
+    // Solo el tipo de fallo (p. ej. TimeoutError), nunca la URL ni datos.
+    const kind = e instanceof Error ? e.name : 'error'
+    console.error('summary/trigger: fallo al llamar a n8n', kind)
+    return json({ error: 'El envío no se pudo iniciar. Intenta de nuevo.', n8n_error: kind }, 502)
   }
   // 11. El navegador consulta /api/summary/status hasta ver el resultado.
   return json({ run_id: runId }, 202)
