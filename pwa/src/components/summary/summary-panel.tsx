@@ -9,7 +9,7 @@ type LastRun = {
   run_id: string | null; mode: string | null; started_at: string; finished_at: string | null
   sent: number | null; failed: { name: string; error: string }[]; status: 'running' | 'finished' | 'unconfirmed'
 }
-type Status = { enabled: boolean; test_mode: boolean; cooldown_remaining_s: number; last_run: LastRun | null }
+type Status = { enabled: boolean; test_mode: boolean; config_missing?: string[]; cooldown_remaining_s: number; last_run: LastRun | null }
 
 const POLL_MS = 3000
 const POLL_MAX_MS = 2 * 60 * 1000
@@ -98,6 +98,9 @@ export function SummaryPanel() {
     setBusy('send'); setMessage(null)
     const { res, data } = await post('/api/summary/trigger', {})
     setBusy(null); setConfirm(null)
+    if (Array.isArray(data.config_missing) && data.config_missing.length > 0) {
+      return setMessage({ kind: 'error', text: `Falta configurar en el servidor: ${(data.config_missing as string[]).join(', ')}.` })
+    }
     if (res.status === 202 && typeof data.run_id === 'string') {
       pollStart.current = Date.now()
       setWaiting(data.run_id)
@@ -114,13 +117,19 @@ export function SummaryPanel() {
   if (!status) return <div className="space-y-2.5" aria-busy="true"><Skeleton className="h-20" /><Skeleton className="h-14" /><Skeleton className="h-28" /></div>
 
   const last = status.last_run
-  const sendDisabled = busy !== null || inProgress || cooldown > 0
+  const configMissing = status.config_missing ?? []
+  const sendDisabled = busy !== null || inProgress || cooldown > 0 || configMissing.length > 0
 
   return (
     <div className="space-y-2.5">
       {status.test_mode && (
         <p role="note" className="rounded-md bg-warn-bg px-3 py-2.5 text-base text-warn-fg">
           Modo de pruebas: los correos llegan solo a la cuenta de pruebas.
+        </p>
+      )}
+      {configMissing.length > 0 && (
+        <p role="alert" className="rounded-md bg-risk-bg px-3 py-2.5 text-base text-risk-fg">
+          Falta configurar en el servidor: {configMissing.join(', ')}. Avisa a quien administra el sistema.
         </p>
       )}
       {message && (

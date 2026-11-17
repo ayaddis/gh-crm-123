@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireSupervisor } from '@/lib/session'
 import { json } from '@/lib/http'
-import { isTestMode } from '@/lib/env.server'
+import { isTestMode, serverEnvIssues } from '@/lib/env.server'
 import { cooldownRemainingSeconds, EVENT, lastRunOf, type AuditEvent } from '@/lib/summary'
 
 export const runtime = 'nodejs'
@@ -28,6 +28,7 @@ export async function GET() {
   return json({
     enabled,
     test_mode: isTestMode(),
+    config_missing: serverEnvIssues(),
     cooldown_remaining_s: cooldownRemainingSeconds(events, cooldown, now),
     last_run: last && { ...last, failed: last.failed.map((f) => ({ name: (f.user_id && names.get(f.user_id)) || 'Usuario', error: f.error ?? 'Sin detalle' })) },
   })

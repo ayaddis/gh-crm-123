@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import type { Json } from '@/types/database'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { serverEnv } from '@/lib/env.server'
+import { serverEnv, serverEnvIssues } from '@/lib/env.server'
 import { requireSupervisor } from '@/lib/session'
 import { json, isSameOrigin } from '@/lib/http'
 import { cooldownRemainingSeconds, EVENT, hasRunInProgress, type AuditEvent } from '@/lib/summary'
@@ -19,6 +19,13 @@ export async function POST(request: NextRequest) {
   // 2. Solo desde la propia PWA, con JSON.
   if (!isSameOrigin(request) || !request.headers.get('content-type')?.includes('application/json')) {
     return json({ error: 'forbidden' }, 403)
+  }
+
+  // Configuración de servidor completa antes de tocar nada.
+  const missing = serverEnvIssues()
+  if (missing.length > 0) {
+    console.error('summary/trigger: configuración incompleta:', missing.join(', '))
+    return json({ error: 'El envío no se pudo iniciar. Intenta de nuevo.', config_missing: missing }, 500)
   }
 
   const supabase = await createClient()

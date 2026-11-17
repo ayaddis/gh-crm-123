@@ -35,3 +35,18 @@ export function serverEnv(): ServerEnv {
 export function isTestMode(): boolean {
   return process.env.MODO_PRUEBA !== 'false'
 }
+
+/** Nombres (nunca valores) de las variables de servidor que faltan o son inválidas. */
+export function serverEnvIssues(): string[] {
+  const parsed = schema.safeParse({
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    N8N_WEBHOOK_URL: process.env.N8N_WEBHOOK_URL,
+    N8N_WEBHOOK_SECRET: process.env.N8N_WEBHOOK_SECRET,
+    N8N_API_SECRET: process.env.N8N_API_SECRET,
+    MODO_PRUEBA: process.env.MODO_PRUEBA,
+    TEST_RECIPIENT_EMAIL: process.env.TEST_RECIPIENT_EMAIL,
+    RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+  })
+  if (parsed.success) return []
+  return [...new Set(parsed.error.issues.map((i) => String(i.path[0])))]
+}
