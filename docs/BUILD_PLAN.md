@@ -347,5 +347,8 @@ Tabla del **Mapa maestro** con estado actual. Novedad: **se usan por primera vez
 | 10 | Desktop: **Administración → Metas** (fijar una meta del mes) y **Historial** | La meta aparece en "Mi mes" del vendedor; el Historial muestra las altas, el cambio de metas, la reasignación y los envíos del resumen; no hay opciones para editar o quitar registros |
 | 11 | Después de las pruebas: **activar** el flujo `WF-CRM123` y verificar a la mañana siguiente (lun-vie, 7:30) | Llega el resumen automático solo si el interruptor está activado |
 
+### Método de despliegue que funcionó (informado por el humano)
+**Método A: *Deploy Hook* abierto en el navegador** (Settings → Git → Deploy Hooks → Copy → pegar la URL en una pestaña nueva → Enter; aparece `"state":"PENDING"`), una sola vez por despliegue y en cada proyecto (`crm-123-web`, `crm-123-pwa`), con rama `gh-crm-123`. El botón **Redeploy** de Vercel **no** sirve para publicar código nuevo: reutiliza el commit anterior (solo es válido cuando únicamente cambiaron variables de entorno). Toda variable nueva o modificada requiere un despliegue nuevo para aplicarse.
+
 ### 4.7 Cierre del Hito 4 y del proyecto
 Informe final con verificaciones, tabla de 15 reglas, resultados de las 11 pruebas, y una lista de **pendientes conocidos**: pasar a un dominio propio en Resend y cambiar `MODO_PRUEBA` a `false` (el MVP envía solo a `ayaddis@gmail.com` mientras tanto), y desactivar el vendedor de prueba. Preguntar: **"¿Confirmas el Hito 4 y el cierre del proyecto?"**.
