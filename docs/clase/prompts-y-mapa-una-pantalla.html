@@ -1,0 +1,528 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompts y mapa CRM-123</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+  /* Plan: primero la bitácora de prompts (lo que se pidió, en orden), después el mapa en una sola pantalla para proyectar.
+     Mismos colores por tipo de pieza que el mapa largo. Títulos en Space Grotesk, texto en Inter. */
+  :root {
+    --bg: #F4F6FB; --surface: #FFFFFF; --fg: #14182B; --muted: #55607A; --line: #D8DDEA; --edge: #66718D;
+    --ia: #6B3FD4;   --ia-bg: #EFE9FC;
+    --rules: #3C4660; --rules-bg: #E9ECF5;
+    --host: #0B6E7F; --host-bg: #DDF2F5;
+    --app: #1F4FD6;  --app-bg: #E5ECFF;
+    --data: #0E7F4F; --data-bg: #DFF4EA;
+    --auto: #9A5200; --auto-bg: #FFEFD6;
+    --sec: #B3204D;  --sec-bg: #FDE5EC;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-head: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1424; --surface: #171D31; --fg: #E8ECF8; --muted: #A2ADC8; --line: #2B3350; --edge: #8F9BBB;
+      --ia: #B79CFF;   --ia-bg: #2A2147;
+      --rules: #B8C2DD; --rules-bg: #242B40;
+      --host: #63CCDD; --host-bg: #0F2F36;
+      --app: #8FB0FF;  --app-bg: #1B2849;
+      --data: #5FD3A0; --data-bg: #12301F;
+      --auto: #FFB65C; --auto-bg: #3A2710;
+      --sec: #FF8FAF;  --sec-bg: #3B1522;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1424; --surface: #171D31; --fg: #E8ECF8; --muted: #A2ADC8; --line: #2B3350; --edge: #8F9BBB;
+    --ia: #B79CFF;   --ia-bg: #2A2147;
+    --rules: #B8C2DD; --rules-bg: #242B40;
+    --host: #63CCDD; --host-bg: #0F2F36;
+    --app: #8FB0FF;  --app-bg: #1B2849;
+    --data: #5FD3A0; --data-bg: #12301F;
+    --auto: #FFB65C; --auto-bg: #3A2710;
+    --sec: #FF8FAF;  --sec-bg: #3B1522;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+    padding-block: 20px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 52px; }
+  h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; line-height: 1.15; }
+  h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 600; letter-spacing: -0.01em; }
+  h3 { font-size: 16px; font-weight: 600; }
+  p { margin: 0; }
+  .lead { font-size: 17px; color: var(--muted); max-width: 62ch; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  header { display: flex; flex-direction: column; gap: 14px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav a { color: var(--fg); text-decoration: none; font-size: 13px; font-weight: 500; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+  nav a:hover { border-color: var(--app); color: var(--app); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--app); outline-offset: 2px; }
+  section { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 12px; }
+  .sec-head { display: flex; flex-direction: column; gap: 8px; }
+  .sec-head p { color: var(--muted); max-width: 68ch; }
+
+  .patterns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+  .pat { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--ia); border-radius: 10px; padding: 12px 14px; font-size: 14px; min-width: 0; }
+  .pat b { display: block; font-family: var(--font-head); font-size: 15px; margin-bottom: 2px; }
+  .pat span { color: var(--muted); }
+
+  .phase { display: flex; flex-direction: column; gap: 12px; }
+  .phase > h3 { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+  .phase > h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .prompt { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .p-top { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .p-top .n { font-family: var(--font-head); font-weight: 700; color: var(--app); }
+  .p-top .kind { flex: 1; min-width: 0; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  .copy { font: inherit; font-size: 12px; font-weight: 600; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .copy:hover { border-color: var(--app); color: var(--app); }
+  .p-text { margin: 0; padding: 14px 16px; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; border-left: 4px solid var(--ia); background: var(--ia-bg); }
+  .p-why { padding: 10px 16px 12px; font-size: 13.5px; color: var(--muted); }
+  .p-why b { color: var(--fg); font-weight: 600; }
+  .note { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--auto); border-radius: 10px; padding: 12px 14px; font-size: 14px; max-width: 80ch; }
+
+  .val { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 12px; }
+  .vcard { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--data); border-radius: 12px; padding: 14px 16px; font-size: 14px; min-width: 0; }
+  .vcard.v-diff { border-top-color: var(--auto); }
+  .vcard.v-miss { border-top-color: var(--sec); }
+  .vcard h3 { margin-bottom: 8px; }
+  .vcard ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .vcard li::marker { color: var(--muted); }
+
+  /* Pantalla única */
+  .screen-wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .screen { width: min(100%, calc((100svh - 40px) * 16 / 9)); aspect-ratio: 16 / 9; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .screen svg { display: block; width: 100%; height: 100%; color: var(--edge); }
+  .screen-wrap p { font-size: 13px; color: var(--muted); text-align: center; }
+  svg text { font-family: var(--font-body); }
+  .nd { stroke-width: 2; }
+  .k-ia .nd { fill: var(--ia-bg); stroke: var(--ia); }
+  .k-rules .nd { fill: var(--rules-bg); stroke: var(--rules); }
+  .k-host .nd { fill: var(--host-bg); stroke: var(--host); }
+  .k-app .nd { fill: var(--app-bg); stroke: var(--app); }
+  .k-data .nd { fill: var(--data-bg); stroke: var(--data); }
+  .k-auto .nd { fill: var(--auto-bg); stroke: var(--auto); }
+  .k-sec .nd { fill: var(--sec-bg); stroke: var(--sec); stroke-dasharray: 8 5; }
+  .nt { font-size: 19px; font-weight: 600; fill: var(--fg); }
+  .ns { font-size: 15px; fill: var(--muted); }
+  .el { font-size: 14px; font-weight: 500; fill: var(--fg); paint-order: stroke; stroke: var(--surface); stroke-width: 6px; stroke-linejoin: round; }
+  .edge { stroke: var(--edge); stroke-width: 2; fill: none; }
+  .stage { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; fill: var(--muted); }
+  .big { font-family: var(--font-head); font-size: 34px; font-weight: 700; fill: var(--fg); letter-spacing: -0.01em; }
+  footer { font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Ejercicio de clase · CRM para seguros</span>
+    <h1>Prompts y mapa de CRM-123</h1>
+    <p class="lead">Primero, los prompts que se usaron para construir la aplicación web y la PWA, en el orden en que se pidieron. Después, el mapa del sistema en una sola pantalla para presentarlo.</p>
+    <nav aria-label="Secciones">
+      <a href="#patrones">Patrones de prompts</a>
+      <a href="#prompts">Los prompts, en orden</a>
+      <a href="#validacion">Validación con la guía</a>
+      <a href="#pantalla">Mapa en una pantalla</a>
+    </nav>
+  </header>
+
+  <section id="patrones">
+    <div class="sec-head">
+      <h2>Seis patrones que se repitieron</h2>
+      <p>Mirados juntos, los prompts siguen unos pocos movimientos. Son lo que conviene copiar para otro proyecto.</p>
+    </div>
+    <div class="patterns">
+      <div class="pat"><b>Contexto y límites</b><span>Qué leer, qué no tocar y qué ya está hecho, antes de empezar.</span></div>
+      <div class="pat"><b>Puerta de confirmación</b><span>"Pide confirmación para el siguiente hito". Nada avanza sin un "confirmo".</span></div>
+      <div class="pat"><b>Recortar el alcance</b><span>Preguntar por qué falta algo y decidir si queda fuera del MVP.</span></div>
+      <div class="pat"><b>Guía paso a paso</b><span>Pedir rutas exactas de clic y no suponer que la persona sabe dónde está cada cosa.</span></div>
+      <div class="pat"><b>Diagnosticar antes de cambiar</b><span>Verificar si algo funciona antes de volver a modificarlo.</span></div>
+      <div class="pat"><b>Volver al rumbo</b><span>Citar el prompt original cuando la conversación se desvía.</span></div>
+    </div>
+  </section>
+
+  <section id="prompts">
+    <div class="sec-head">
+      <h2>Los prompts de la construcción, en orden</h2>
+      <p>Los prompts 1 y 2 son los de la guía del profesor (pasos 2.14 y 3.7), copiados tal cual. El 19 sigue el modelo del paso 4.15. El resto son tus mensajes, con la ortografía corregida. Los marcados con G vienen de la guía y se dieron en otras conversaciones. Se omitieron las capturas, las rutas de archivos de tu computadora y cualquier dato personal. Cada prompt trae el botón Copiar.</p>
+    </div>
+
+    <div class="phase">
+      <h3>Fases previas · según la guía, en otras conversaciones</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">G1</span><span class="kind">Claude.ai Chat · paso 1.1 · prompt completo</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">## El proyecto
+Necesito tu ayuda para preparar las instrucciones de un proyecto: un CRM minimalista y simplificado, de funcionalidad estándar y con opciones estrictamente básicas pero necesarias, que voy a construir con herramientas de IA de Claude. No tengo perfil técnico.
+
+Está destinado a un equipo comercial pequeño, con dos aplicaciones web:
+1) Una aplicación web de escritorio para la gestión diaria de los vendedores.
+2) Una PWA para el supervisor.
+
+## Restricciones que debe seguir estrictamente toda la documentación
+1. El diseño y el desarrollo deben ser estándar, simplificados, minimalistas y funcionales, con opciones estrictamente básicas y necesarias, siguiendo buenas prácticas de diseño y desarrollo.
+2. Prohibido pedir o guardar identificadores personales (DPI, NIT, DNI, pasaporte). El teléfono se usará como identificador del cliente.
+3. Roles del CRM: Vendedor y Supervisor, con usuario y contraseña; 10 vendedores y 2 supervisores. El Supervisor debe tener todos los accesos de administrador.
+4. Los datos se almacenarán en Supabase.
+5. El proyecto de Claude Code Web se guardará en GitHub.
+6. El despliegue de GitHub hacia Vercel se realizará manualmente.
+7. El resumen matutino se activa en la PWA para enviar un correo desde n8n vía Resend.
+8. Automatizaciones en n8n: resumen matutino por correo a cada vendedor.
+
+## Configuración a utilizar en todo el proyecto
+1) Nombre de marca: CRM-123
+2) Una rama para los fuentes de Claude Code Web, con dos carpetas una para sitio Web y otra para PWA, el nombre de la rama es : gh-crm-123
+3) Nombre de la base de datos en el almacén de Supabase: dbcrm123
+4) Organización de Supabase: Org CRM 123
+5) El flujo n8n para el resumen matutino llámalo:   WF-CRM123
+6) El correo originador para Resend es onboarding@resend.dev
+
+## Cómo quiero que trabajemos
+Entrevístame por rondas temáticas: máximo 5 preguntas por ronda y máximo 6 rondas. Antes de cada ronda, dime en una línea qué vamos a decidir.
+- Confirma al inicio el giro del negocio, el país de operación y la moneda.
+- Usa lenguaje de negocio. Si necesitas un dato técnico, explica en una línea qué implica cada opción y recomiéndame una que sea simple pero segura.
+- Si la decisión es de bajo riesgo, propón un valor por defecto y solo pídeme confirmarlo.
+- Si mi respuesta abre una decisión nueva, agrégala a una ronda posterior.
+- Cierra cada ronda con un resumen acumulado de lo decidido.
+- Para las piezas del stack que aún faltan, propónmelas tú con una justificación breve y déjame aprobarlas.
+
+## Cinco entregables que debes generar
+Al terminar la entrevista, y no antes, genera los documentos por separado: DESIGN_BRIEF.md, TECHNICAL_SPEC.md, CLAUDE.md, BUILD_PLAN.md, SCRIPTS-SQL.md con las siguientes especificaciones para cada uno:
+
+**`DESIGN_BRIEF.md`** para Claude Design: pantallas, información y jerarquía de cada una, estados (vacía, cargando, error, proceso en ejecución), flujos y dirección visual. El escritorio es denso y operativo; el móvil es de consulta rápida. Sin código ni base de datos. Debe respetar estrictamente la estructura de base de datos que se trasladará en SCRIPTS-SQL.md al momento del diseño, sin realizar cambios.
+
+**`TECHNICAL_SPEC.md`** para Claude Code Web: modelo de datos, reglas de seguridad por fila, endpoints, cómo se protege paso a paso el disparo manual de la automatización del flujo de n8n, y variables de entorno. Debe respetar estrictamente la estructura de base de datos que se trasladará en SCRIPTS-SQL.md al momento del diseño, sin realizar cambios.
+
+**`CLAUDE.md`**: el contrato para Claude Code Web, con las siguientes reglas de seguridad
+
+## Seguridad, lo innegociable
+Estas reglas no se relajan por comodidad ni por prisa. Todas deben cumplirse en los comandos de la base de datos.
+- **RLS activa en todas las tablas**, incluidas configuración y auditoría. Ninguna excepción.
+- **Ninguna política de `DELETE`.** No hay borrado físico, solo archivado lógico. Nunca uses la palabra "eliminar" en la interfaz.
+- **`activities` y `audit_log` son solo de inserción.** Sin políticas de `UPDATE` ni `DELETE` para nadie, incluido el supervisor.
+- **Toda política de `UPDATE` lleva `with check`**, no solo `using`. Sin él, un vendedor cambia `owner_id` y se queda con la oportunidad de otro.
+- **Ninguna política con condición `true`**, salvo el `select` de `settings`.
+- **Todas las vistas con `security_invoker = true`.** Una vista sin esto filtra los datos de todo el equipo a cualquier vendedor.
+- **Toda función `security definer` fija `search_path = public`.**
+- **`SUPABASE_SERVICE_ROLE_KEY` nunca sale del servidor.** Solo en Route Handlers y Server Actions. Jamás en un componente cliente, ni siquiera importado sin usar.
+- **Los secretos se comparan con `crypto.timingSafeEqual`**, nunca con `===`.
+- **El rol se lee de la tabla `profiles`**, nunca de un JWT ni de nada que venga del cliente.
+- **n8n nunca toca Postgres.** Todo pasa por los endpoints `/api/n8n/*` de la aplicación.
+
+**`BUILD_PLAN.md`**: un plan de 4 hitos. Al inicio de cada hito, informa las variables de entorno que necesitan las aplicaciones para toda su funcionalidad, explica el procedimiento para obtener sus valores y verifica que estén configuradas en los aplicativos. Si el humano tiene que actualizarlas, avísalo al final del hito, antes de las pruebas de funcionalidad.
+
+***Para que Claude.ai Chat genere todas las instrucciones de creación, pruebas y validación de la base de datos con el conector MCP de Supabase (que se le proporcionará cuando el humano ejecute este primer HITO en otra conversación de Claude.ai Chat), toma en cuenta toda la documentación que estamos construyendo: `CLAUDE.md`, `TECHNICAL_SPEC.md` y, especialmente, `SCRIPTS-SQL.md`, que contendrá toda la estructura oficial de la base de datos y las pruebas para confirmar su correcta creación.
+
+### Hito 1 - Base de datos: **Qué construye:** el script para la base de datos; entrégalo. Nada de interfaz.
+
+***Para que Claude Code Web construya el plan de despliegue en 3 hitos, toma en cuenta `CLAUDE.md` y `TECHNICAL_SPEC.md` para cada uno. En cada hito, indica que NO puede avanzar al siguiente hasta recibir la confirmación del humano. Por cada hito, entrega el procedimiento a seguir y las variables que deben crearse en Vercel.
+
+### Hito 2 - Entrar y desplegar **Qué construye:** del proyecto, solo el ingreso, el armazón de navegación y el tablero del día vacío.
+### Hito 3 - Núcleo comercial **Qué construye:** agrega a la funcionalidad existente lo que un vendedor usa todos los días.
+### Hito 4 - Supervisión y una automatización **Qué construye:** agrega a la funcionalidad existente el panel del equipo y el flujo JSON de n8n del spec (resumen matutino) para importarlo manualmente en n8n Cloud.
+
+**`SCRIPTS-SQL.md`**: genera la estructura de base de datos de este proyecto, que será la oficial para todos los documentos, y todos los scripts SQL para construirla. Se usará para lo siguiente:
+1) Que Claude.ai Chat la utilice para crear toda la estructura de base de datos en el almacén de Supabase y, además, compruebe toda la estructura: llaves, índices, roles, políticas y todas las condiciones de integridad o relación.
+2) Que Claude Design la tome como referencia en el diseño.
+3) Que Claude Code Web la utilice como estructura estricta del almacén de datos.
+
+Después de entregar los cinco entregables, ya no realices nada más, pregunta si puedes iniciar con el Hito 1 para creación de base de datos y espera confirmación.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> describió el proyecto, fijó las restricciones y la configuración, y pidió una entrevista por rondas. Al final generó cinco documentos: DESIGN_BRIEF, TECHNICAL_SPEC, CLAUDE, BUILD_PLAN y SCRIPTS-SQL. <b>Aquí está el origen de los documentos de reglas.</b> Es el prompt más largo de todo el ejercicio y concentra el contexto, las reglas de seguridad y el plan de hitos. Texto de la guía, con una errata corregida ("sguridad").</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">G2</span><span class="kind">Claude.ai Chat con conector de Supabase · paso 1.3</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Lee y realiza el Hito 1 de BUILD_PLAN.md para crear la base de datos dbcrm123 contenida en SCRIPTS-SQL.md para la organización Org CRM 123 utiliza el conector de Supabase que ya tienes. Para las reglas y uso de cada tabla lee CLAUDE.md y TECHNICAL_SPEC.md. Al final, dime cómo generar las variables que necesitarán los aplicativos web que se van a construir para usar esta base de datos.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> creó la base de datos (Hito 1) en una conversación separada.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">G3</span><span class="kind">Claude Design · paso 2.4</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Realiza el diseño especificado en el archivo adjunto DESIGN_BRIEF.md, respetando estrictamente la estructura de base de datos de SCRIPTS-SQL.md.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> pidió el diseño sin repetir detalles, porque todo estaba en los archivos.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">G4</span><span class="kind">Claude Design · paso 2.7</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Revisa que el resultado entregado no contenga errores de diseño; si encuentras errores, corrígelos.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> evitó llevar errores de diseño a la etapa de código.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">G5</span><span class="kind">Claude Design · paso 2.8</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Construye un README.handoff para que Claude Code Web pueda continuar con el proceso de desarrollo. Además de lo que identifiques como necesario, agrega este detalle de requerimientos que también debe contener el documento:
+- Lista de pantallas construidas y el nombre exacto de cada archivo o componente.
+- Los valores visuales finales: colores en código hexadecimal, tipografía, tamaños y espaciados.
+- Qué componentes de shadcn/ui o del sistema de diseño se usaron, para que Claude Code Web no reinvente los mismos botones.
+- Dónde se apartó del brief (descripción inicial) y por qué.
+- Qué quedó como maqueta sin funcionalidad, para que Claude Code Web sepa qué falta conectar.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> produjo el README.handoff que se menciona en el prompt 1. <b>Aquí está el origen de ese archivo.</b></p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Arranque</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">1</span><span class="kind">Contexto y límites · texto de la guía, paso 2.14</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Lee el README.handoff y solicita los archivos de especificación TECHNICAL_SPEC.md, BUILD_PLAN.md, CLAUDE.md y SCRIPTS-SQL.md. No inicies ningún desarrollo sin estos archivos; úsalos para contrastarlos con el diseño recibido. Utiliza el repositorio de GitHub llamado gh-crm-123. Respeta estrictamente la estructura de la base de datos establecida en SCRIPTS-SQL.md; no la cambies. Cumple con BUILD_PLAN.md para realizar el despliegue en los hitos previstos para esta fase.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> envió el diseño de Claude Design a Claude Code Web con tres límites claros: pedir los documentos, no tocar la base de datos y seguir el plan por hitos.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">2</span><span class="kind">Puerta de entrada · texto de la guía, paso 3.7 (con los 4 documentos adjuntos)</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Revisa los archivos BUILD_PLAN.md, CLAUDE.md, SCRIPTS-SQL.md y TECHNICAL_SPEC.md. Si necesitas resolver contradicciones o confirmaciones, avisa y espera respuesta. El Hito 1 ya fue resuelto antes por Claude.ai Chat; no lo realices. Si todo está bien, realiza el desarrollo. Pide confirmación para iniciar el Hito 2.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> obligó a revisar antes de construir, avisar si los documentos se contradicen y esperar una luz verde. Indicó qué ya estaba hecho (la base de datos).</p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Hito 2 · Entrar y moverse</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">3</span><span class="kind">Luz verde</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">inicia Hito 2</p>
+        <p class="p-why"><b>Para qué sirvió:</b> autorizó una sola etapa, no todo el proyecto.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">4</span><span class="kind">Puerta de confirmación</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">confirmo hito 2</p>
+        <p class="p-why"><b>Para qué sirvió:</b> cerró la etapa y autorizó la siguiente. Sin esta frase no se avanza.</p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Decisión de alcance</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">5</span><span class="kind">Recortar el alcance</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">¿Por qué no hiciste el comparativo?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> preguntó por una pantalla del diseño que no se había construido y abrió la decisión de alcance.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">6</span><span class="kind">Decisión</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Ok, déjalo fuera por ahora.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> fijó el recorte. Las gráficas, el orden por columnas y el catálogo de zonas siguieron la misma regla.</p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Despliegue y accesos</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">7</span><span class="kind">Guía paso a paso</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Incorporé la primera, revisa y dime cómo agrego las demás.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> pidió que cada variable de entorno se explicara una por una, mientras se cargaban en Vercel.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">8</span><span class="kind">Guía paso a paso</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">¿De dónde saco la llave secret?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> llevó a la ruta exacta dentro de Supabase para obtener la llave del servidor.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">9</span><span class="kind">Revisar el contexto antes de actuar</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Tengo una duda: antes de decirte que me marcó error en Vercel estabas trabajando en algo. ¿Puedes revisar en dónde te quedaste? Estábamos con los hitos. Valida en esta conversación, analiza antes y coméntame.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> hizo que Claude revisara la conversación y el plan antes de responder, en lugar de improvisar.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">10</span><span class="kind">Volver al rumbo</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Pero ¿no lo vas a hacer tú conforme te di instrucciones? Este fue el prompt que te di antes: "Revisa los archivos BUILD_PLAN.md, CLAUDE.md, SCRIPTS-SQL.md y TECHNICAL_SPEC.md. Si necesitas resolver contradicciones o confirmaciones, avisa y espera respuesta. El Hito 1 ya fue resuelto antes por Claude.ai Chat; no lo realices. Si todo está bien, realiza el desarrollo. Pide confirmación para iniciar el Hito 2." Analiza.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> citar el prompt original corrigió el rumbo cuando la conversación se desvió.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">11</span><span class="kind">Guía paso a paso</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Bueno, veme guiando paso a paso.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> fijó el modo de trabajo del resto del ejercicio: una instrucción a la vez, con confirmación después de cada una.</p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Pruebas de los hitos</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">12</span><span class="kind">Delegar</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Haz las pruebas tú. Si requieres que yo haga algo en Vercel o Supabase, me lo dices y lo hago.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> pidió que la IA hiciera lo que pudiera. Claude no puede entrar a tus sitios, así que validó en la base en solo lectura y te guio en el resto.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">13</span><span class="kind">Contrastar con la guía de la clase</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Revisa este documento y ve en dónde nos desviamos. El maestro no ha indicado pruebas...</p>
+        <p class="p-why"><b>Para qué sirvió:</b> con la guía en PDF adjunta, comparó el avance contra lo que pedía la clase.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">14</span><span class="kind">Corregir el nivel</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">No tengo ni idea de lo que me preguntas, ¿no se supone que tú debes hacer esto?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> avisó que el lenguaje era demasiado técnico. Desde ahí las instrucciones fueron en términos de negocio.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">15</span><span class="kind">Guía paso a paso</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">No asumas que sé dónde cambiar las cosas.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> consiguió rutas exactas de clic, como "Settings → Git → Deploy Hooks → Copy".</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">16</span><span class="kind">Diagnosticar antes de cambiar</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">¿Por qué no verificamos que esté funcionando o no antes de volver a modificar algo?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> frenó los cambios a ciegas. Después se revisó qué respondía cada pieza antes de tocarla.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">17</span><span class="kind">Que la IA valide directo</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Eso ya lo puedes hacer tú, ¿no?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> Claude pasó a comprobar en la base de datos lo que se podía, sin pedirte capturas.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">18</span><span class="kind">Guía paso a paso</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Paso 4: debes decirme paso a paso. No pienses que todo lo sé.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> convirtió una instrucción de una línea en un procedimiento con cada clic.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">19</span><span class="kind">Puerta de confirmación · modelo de la guía, paso 4.15</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Confirmo que las pruebas del Hito 3 funcionaron correctamente; continúa con el Hito 4.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> la confirmación de mayor calidad: dice qué se probó y autoriza lo siguiente.</p>
+      </article>
+    </div>
+
+    <div class="phase">
+      <h3>Cierre</h3>
+      <article class="prompt">
+        <div class="p-top"><span class="n">20</span><span class="kind">Verificar y preguntar qué sigue</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Confirmé: van 2 días que me llega la notificación de las 7:30 a. m. ¿Qué sigue?</p>
+        <p class="p-why"><b>Para qué sirvió:</b> aportó la prueba que solo se ve con el tiempo: el envío automático salió dos mañanas seguidas.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">21</span><span class="kind">Decisión asumida</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">La llave no la voy a rotar.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> dejó registrado un riesgo aceptado a conciencia, que Claude anotó como pendiente.</p>
+      </article>
+      <article class="prompt">
+        <div class="p-top"><span class="n">22</span><span class="kind">Cierre formal</span><button class="copy" type="button">Copiar</button></div>
+        <p class="p-text">Confirmo el Hito 4 y el cierre del proyecto.</p>
+        <p class="p-why"><b>Para qué sirvió:</b> cerró el proyecto con una frase que el plan exigía por escrito.</p>
+      </article>
+    </div>
+
+    <div class="note"><b>Los prompts cortos también cuentan.</b> Entre estos hubo muchos mensajes de una línea ("ya lo hice", "sigo con el paso 2", "me marca error"). Son los que mantuvieron el ritmo de una instrucción a la vez, y no se listan porque dependen del paso anterior.</div>
+  </section>
+
+  <section id="validacion">
+    <div class="sec-head">
+      <h2>Validación contra la guía del profesor</h2>
+      <p>Comparé la guía (63 páginas) con lo que se hizo en esta conversación. La cadena de trabajo es la misma. Cambian los detalles, porque los documentos de reglas de este ejercicio son otra versión de los que usa la guía.</p>
+    </div>
+    <div class="val">
+      <div class="vcard v-ok"><h3>Coincide</h3><ul>
+        <li>Prompts 1 y 2: el texto es idéntico a los pasos 2.14 y 3.7.</li>
+        <li>Cadena: Claude.ai Chat, Claude Design y Claude Code Web, en ese orden.</li>
+        <li>Cuatro hitos, cada uno con confirmación escrita antes de avanzar.</li>
+        <li>Dos proyectos en Vercel (web y pwa), un flujo de n8n a las 7:30 de lunes a viernes y remitente <code>onboarding@resend.dev</code>.</li>
+        <li>El resumen llegó solo el martes y el miércoles a las 7:30.</li>
+        <li>El manual de usuario del paso 4.31 ya se generó, en Markdown y en PDF.</li>
+      </ul></div>
+      <div class="vcard v-diff"><h3>Difiere</h3><ul>
+        <li>Pruebas de la guía con euros y teléfono +34. Este ejercicio usa pesos y 10 dígitos.</li>
+        <li>Variables: la guía usa <code>N8N_SHARED_SECRET</code> y <code>N8N_WEBHOOK_MORNING_DIGEST_URL</code>. Aquí fueron <code>N8N_WEBHOOK_URL</code>, <code>N8N_WEBHOOK_SECRET</code> y <code>N8N_API_SECRET</code>.</li>
+        <li>Seguridad del disparo: la guía usa firma y nonce. Aquí, dos secretos distintos y una espera de 120 segundos (la guía pide 10 minutos).</li>
+        <li>Archivo del flujo: <code>n8n/morning-digest.json</code> en la guía y <code>n8n/WF-CRM123.json</code> aquí.</li>
+        <li>Nombres en Vercel: <code>gh-crm-123-web</code> y <code>-pwa</code> en la guía; <code>crm-123-web</code> y <code>-pwa</code> aquí.</li>
+        <li>Llaves de Supabase: la guía usa las "Legacy". Aquí se usaron las nuevas (publishable y secret).</li>
+        <li>El Hito 4 de este ejercicio tuvo 11 pruebas. La guía lista 29.</li>
+      </ul></div>
+      <div class="vcard v-miss"><h3>Falta</h3><ul>
+        <li>La prueba 29 de la guía: que no llegue nada en fin de semana. Se puede comprobar este sábado 21 o domingo 22.</li>
+        <li>El prompt "entrega el JSON para n8n primero e inicia el Hito 4" (paso 4.18) no se usó. Aquí el flujo salió dentro del Hito 4.</li>
+      </ul></div>
+    </div>
+    <div class="note"><b>Corrección a lo que dije antes:</b> el origen de los documentos de reglas sí está documentado. Los generó Claude.ai Chat en la fase 1 de la guía (prompt G1). El README.handoff lo generó Claude Design (prompt G5).</div>
+  </section>
+
+  <section id="pantalla">
+    <div class="sec-head">
+      <h2>CRM-123 en una pantalla</h2>
+      <p>Para proyectar: cabe completo en una vista de 16:9. Ábrelo en pantalla completa.</p>
+    </div>
+    <div class="screen-wrap">
+      <div class="screen">
+        <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" role="img" aria-label="CRM-123 en una pantalla: los documentos de reglas guían a tres herramientas de Claude que construyen la base y el código. El código va a GitHub y, con un Deploy Hook manual, a Vercel, que publica web y pwa. Las personas usan las apps, que guardan en Supabase con permisos. n8n con Resend manda el resumen y se comunica con la aplicación por la API. La seguridad aplica a todo.">
+          <defs><marker id="p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+
+          <text class="big" x="40" y="52">CRM-123 en una pantalla</text>
+          <text class="ns" x="40" y="80">CRM para pólizas de seguros en México · 10 vendedores y 2 supervisores · resumen automático a las 7:30</text>
+
+          <text class="stage" x="40" y="116">1 · CONSTRUIR</text>
+          <text class="stage" x="470" y="116">2 · PUBLICAR Y AUTOMATIZAR</text>
+          <text class="stage" x="900" y="116">3 · USAR Y GUARDAR</text>
+
+          <!-- Columna 1 -->
+          <g class="k-rules" transform="translate(40,130)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">Documentos de reglas</text><text class="ns" x="18" y="64">5 archivos: qué sí, qué no</text><text class="ns" x="18" y="86">La base de datos es intocable</text></g>
+          <g class="k-ia" transform="translate(40,290)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="32">Tres herramientas Claude</text><text class="ns" x="18" y="58">Design: dibuja las pantallas</text><text class="ns" x="18" y="78">Chat: crea la base de datos</text><text class="ns" x="18" y="98">Code: programa las 2 apps</text></g>
+
+          <!-- Columna 2 -->
+          <g class="k-host" transform="translate(470,130)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">GitHub</text><text class="ns" x="18" y="64">Guarda el código con historial</text><text class="ns" x="18" y="86">Una sola rama: gh-crm-123</text></g>
+          <g class="k-host" transform="translate(470,290)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">Vercel</text><text class="ns" x="18" y="64">Publica las apps en internet</text><text class="ns" x="18" y="86">Guarda las variables secretas</text></g>
+          <g class="k-auto" transform="translate(470,450)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">n8n + Resend</text><text class="ns" x="18" y="64">El robot del resumen y su cartero</text><text class="ns" x="18" y="86">Lunes a viernes, 7:30 a. m.</text></g>
+
+          <!-- Columna 3 -->
+          <g class="k-rules" transform="translate(900,130)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">Personas</text><text class="ns" x="18" y="64">Vendedores y supervisores</text><text class="ns" x="18" y="86">Entran con correo y contraseña</text></g>
+          <g class="k-app" transform="translate(900,290)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">web + pwa</text><text class="ns" x="18" y="64">web: el trabajo diario</text><text class="ns" x="18" y="86">pwa: consulta del supervisor</text></g>
+          <g class="k-data" transform="translate(900,450)"><rect class="nd" width="340" height="110" rx="12"/><text class="nt" x="18" y="36">Supabase</text><text class="ns" x="18" y="64">Datos, usuarios y permisos</text><text class="ns" x="18" y="86">Cada quien ve solo lo suyo (RLS)</text></g>
+
+          <!-- Conexiones -->
+          <line class="edge" x1="210" y1="240" x2="210" y2="288" marker-end="url(#p1)"/>
+          <text class="el" x="222" y="270">guían</text>
+
+          <path class="edge" d="M380 345 H425 V185 H468" marker-end="url(#p1)"/>
+          <text class="el" x="430" y="268">sube código</text>
+
+          <line class="edge" x1="640" y1="240" x2="640" y2="288" marker-end="url(#p1)"/>
+          <text class="el" x="652" y="270">Deploy Hook, a mano</text>
+
+          <line class="edge" x1="810" y1="345" x2="898" y2="345" marker-end="url(#p1)"/>
+          <text class="el" x="854" y="334" text-anchor="middle">publica</text>
+
+          <line class="edge" x1="1070" y1="240" x2="1070" y2="288" marker-end="url(#p1)"/>
+          <text class="el" x="1082" y="270">usan</text>
+
+          <line class="edge" x1="1070" y1="400" x2="1070" y2="448" marker-start="url(#p1)" marker-end="url(#p1)"/>
+          <text class="el" x="1082" y="430">leen y guardan</text>
+
+          <line class="edge" x1="640" y1="400" x2="640" y2="448" marker-start="url(#p1)" marker-end="url(#p1)"/>
+          <text class="el" x="652" y="430">API con secreto</text>
+
+          <!-- Seguridad y cifras -->
+          <g class="k-sec" transform="translate(40,590)"><rect class="nd" width="1200" height="100" rx="12"/>
+            <text class="nt" x="20" y="36">Seguridad en todo</text>
+            <text class="ns" x="20" y="62">Permisos por fila · nada se borra · el historial no se edita</text>
+            <text class="ns" x="20" y="82">Llaves solo en el servidor · n8n entra solo por la API</text>
+            <text class="nt" x="800" y="36">2 apps · 1 base de datos · 1 robot</text>
+            <text class="ns" x="800" y="62">4 hitos, cada uno con confirmación escrita</text>
+            <text class="ns" x="800" y="82">11 pruebas en el último y envío real 2 días seguidos</text>
+          </g>
+        </svg>
+      </div>
+      <p>Verde: base de datos · Azul: aplicaciones · Turquesa: código y publicación · Violeta: herramientas Claude · Ámbar: automatización · Rosa: seguridad.</p>
+    </div>
+  </section>
+
+  <footer>Los nombres y datos de las pruebas son ficticios. No incluye llaves ni correos reales.</footer>
+</div>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.copy');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.prompt');
+        var text = card.querySelector('.p-text').textContent;
+        function done(ok) {
+          var old = 'Copiar';
+          btn.textContent = ok ? 'Copiado' : 'Selecciona y copia';
+          if (!ok) {
+            var range = document.createRange();
+            range.selectNodeContents(card.querySelector('.p-text'));
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+          setTimeout(function () { btn.textContent = old; }, 1800);
+        }
+        try {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+        } catch (e) { done(false); }
+      });
+    });
+  })();
+</script>
+
+</html>

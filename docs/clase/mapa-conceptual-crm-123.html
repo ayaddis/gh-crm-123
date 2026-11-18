@@ -1,0 +1,567 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de CRM-123</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+  /* Plan: mapa didáctico de una clase. Paleta neutra azulada; un color por tipo de pieza (IA, reglas, código, producto, datos, automatización, seguridad).
+     Tipografía: Space Grotesk para títulos, Inter para texto. Diseño: nav simple, un mapa grande, tarjetas por herramienta, dos flujos dibujados. */
+  :root {
+    --bg: #F4F6FB; --surface: #FFFFFF; --fg: #14182B; --muted: #55607A; --line: #D8DDEA; --edge: #66718D;
+    --ia: #6B3FD4;   --ia-bg: #EFE9FC;
+    --rules: #3C4660; --rules-bg: #E9ECF5;
+    --host: #0B6E7F; --host-bg: #DDF2F5;
+    --app: #1F4FD6;  --app-bg: #E5ECFF;
+    --data: #0E7F4F; --data-bg: #DFF4EA;
+    --auto: #9A5200; --auto-bg: #FFEFD6;
+    --sec: #B3204D;  --sec-bg: #FDE5EC;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-head: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1424; --surface: #171D31; --fg: #E8ECF8; --muted: #A2ADC8; --line: #2B3350; --edge: #8F9BBB;
+      --ia: #B79CFF;   --ia-bg: #2A2147;
+      --rules: #B8C2DD; --rules-bg: #242B40;
+      --host: #63CCDD; --host-bg: #0F2F36;
+      --app: #8FB0FF;  --app-bg: #1B2849;
+      --data: #5FD3A0; --data-bg: #12301F;
+      --auto: #FFB65C; --auto-bg: #3A2710;
+      --sec: #FF8FAF;  --sec-bg: #3B1522;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1424; --surface: #171D31; --fg: #E8ECF8; --muted: #A2ADC8; --line: #2B3350; --edge: #8F9BBB;
+    --ia: #B79CFF;   --ia-bg: #2A2147;
+    --rules: #B8C2DD; --rules-bg: #242B40;
+    --host: #63CCDD; --host-bg: #0F2F36;
+    --app: #8FB0FF;  --app-bg: #1B2849;
+    --data: #5FD3A0; --data-bg: #12301F;
+    --auto: #FFB65C; --auto-bg: #3A2710;
+    --sec: #FF8FAF;  --sec-bg: #3B1522;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+    padding-block: 20px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+  h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; line-height: 1.15; }
+  h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 600; letter-spacing: -0.01em; }
+  h3 { font-size: 17px; font-weight: 600; }
+  p { margin: 0; }
+  .lead { font-size: 17px; color: var(--muted); max-width: 62ch; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  header { display: flex; flex-direction: column; gap: 14px; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav a {
+    color: var(--fg); text-decoration: none; font-size: 13px; font-weight: 500; padding: 7px 12px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+  nav a:hover { border-color: var(--app); color: var(--app); }
+  a:focus-visible { outline: 2px solid var(--app); outline-offset: 2px; }
+  section { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 12px; }
+  .sec-head { display: flex; flex-direction: column; gap: 8px; }
+  .sec-head p { color: var(--muted); max-width: 70ch; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); }
+  .legend i { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; display: inline-block; }
+  .l-ia i { background: var(--ia-bg); border-color: var(--ia); }
+  .l-rules i { background: var(--rules-bg); border-color: var(--rules); }
+  .l-host i { background: var(--host-bg); border-color: var(--host); }
+  .l-app i { background: var(--app-bg); border-color: var(--app); }
+  .l-data i { background: var(--data-bg); border-color: var(--data); }
+  .l-auto i { background: var(--auto-bg); border-color: var(--auto); }
+  .l-sec i { background: var(--sec-bg); border-color: var(--sec); }
+
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .fig-scroll { overflow-x: auto; }
+  .fig-scroll svg { display: block; width: 100%; min-width: 900px; height: auto; color: var(--edge); }
+  figcaption { font-size: 13px; color: var(--muted); max-width: 90ch; }
+  .hint { display: none; font-size: 12px; color: var(--muted); }
+  @media (max-width: 920px) { .hint { display: block; } }
+
+  /* SVG */
+  svg text { font-family: var(--font-body); }
+  .nd { stroke-width: 1.6; }
+  .k-ia .nd { fill: var(--ia-bg); stroke: var(--ia); }
+  .k-rules .nd { fill: var(--rules-bg); stroke: var(--rules); }
+  .k-host .nd { fill: var(--host-bg); stroke: var(--host); }
+  .k-app .nd { fill: var(--app-bg); stroke: var(--app); }
+  .k-data .nd { fill: var(--data-bg); stroke: var(--data); }
+  .k-auto .nd { fill: var(--auto-bg); stroke: var(--auto); }
+  .k-sec .nd { fill: var(--sec-bg); stroke: var(--sec); stroke-dasharray: 6 4; }
+  .nt { font-size: 13px; font-weight: 600; fill: var(--fg); }
+  .ns { font-size: 11px; fill: var(--muted); }
+  .el { font-size: 11px; fill: var(--fg); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+  .edge { stroke: var(--edge); stroke-width: 1.5; fill: none; }
+  .life { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 5; }
+  .badge { fill: var(--fg); }
+  .badge-t { font-size: 10px; font-weight: 600; fill: var(--surface); text-anchor: middle; }
+
+  /* Tarjetas de herramientas */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-top-width: 4px; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .card.c-ia { border-top-color: var(--ia); } .card.c-rules { border-top-color: var(--rules); }
+  .card.c-host { border-top-color: var(--host); } .card.c-app { border-top-color: var(--app); }
+  .card.c-data { border-top-color: var(--data); } .card.c-auto { border-top-color: var(--auto); }
+  .card.c-sec { border-top-color: var(--sec); }
+  .tag { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .card dl { margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  .card dt { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .card dd { margin: 2px 0 0; }
+  .analogy { font-size: 13.5px; background: var(--bg); border-radius: 8px; padding: 9px 11px; color: var(--muted); }
+  .analogy b { color: var(--fg); font-weight: 600; }
+  .todo { font-size: 13px; color: var(--sec); font-weight: 500; }
+  code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.88em; background: var(--bg); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+
+  .note { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--auto); border-radius: 10px; padding: 12px 14px; font-size: 14px; max-width: 90ch; }
+  .note.sec { border-left-color: var(--sec); }
+  .note b { font-weight: 600; }
+  ol.phases { margin: 0; padding-left: 20px; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+  ol.phases b { color: var(--fg); font-weight: 600; }
+
+  /* Hitos (secuencia real) */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; counter-reset: h; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; counter-increment: h; min-width: 0; }
+  .step .n { font-family: var(--font-head); font-weight: 700; font-size: 13px; color: var(--app); }
+  .step .n::before { content: "Hito " counter(h); }
+  .step p { font-size: 14px; color: var(--muted); }
+  .step .who { font-size: 12px; font-weight: 600; color: var(--fg); }
+
+  /* Lecciones */
+  .lessons { display: flex; flex-direction: column; gap: 10px; }
+  .lesson { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .lesson > div { padding: 14px 16px; font-size: 14px; min-width: 0; }
+  .lesson > div:first-child { border-right: 1px solid var(--line); }
+  .lesson .k { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .lesson .k.bad { color: var(--sec); } .lesson .k.good { color: var(--data); }
+  @media (max-width: 640px) { .lesson { grid-template-columns: 1fr; } .lesson > div:first-child { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+  /* Glosario */
+  .gloss { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; margin: 0; }
+  .gloss div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .gloss dt { font-weight: 600; font-size: 14px; }
+  .gloss dd { margin: 3px 0 0; font-size: 13.5px; color: var(--muted); }
+  .next { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+  .next li { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; font-size: 13px; }
+  footer { font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Ejercicio de clase · CRM para seguros</span>
+    <h1>Mapa de CRM-123</h1>
+    <p class="lead">Qué construimos, con qué herramientas, para qué sirve cada una y cómo se conectan entre sí. Empieza por el mapa grande y baja hasta el detalle.</p>
+    <nav aria-label="Secciones">
+      <a href="#mapa">1. Mapa general</a>
+      <a href="#herramientas">2. Herramientas</a>
+      <a href="#flujos">3. Cómo fluye todo</a>
+      <a href="#seguridad">4. Seguridad</a>
+      <a href="#hitos">5. Los 4 hitos</a>
+      <a href="#lecciones">6. Lecciones</a>
+      <a href="#glosario">7. Glosario</a>
+    </nav>
+  </header>
+
+  <section id="mapa">
+    <div class="sec-head">
+      <h2>El mapa general</h2>
+      <p>CRM-123 es un sistema pequeño para un equipo comercial de pólizas de seguros en México: 10 vendedores y 2 supervisores. Son dos aplicaciones, una base de datos y un robot que manda el resumen de las 7:30. Cada color es un tipo de pieza.</p>
+    </div>
+    <div class="legend" aria-label="Leyenda de colores">
+      <span class="l-ia"><i></i>IA que construyó</span>
+      <span class="l-rules"><i></i>Reglas y personas</span>
+      <span class="l-host"><i></i>Código y publicación</span>
+      <span class="l-app"><i></i>Aplicaciones</span>
+      <span class="l-data"><i></i>Datos</span>
+      <span class="l-auto"><i></i>Automatización</span>
+      <span class="l-sec"><i></i>Seguridad</span>
+    </div>
+    <figure>
+      <span class="hint">Desliza el mapa hacia los lados para verlo completo.</span>
+      <div class="fig-scroll">
+      <svg viewBox="0 0 1260 660" role="img" aria-label="Mapa de CRM-123: los documentos de reglas guían a Claude Code Web, que con el diseño de Claude Design escribe el código, lo sube a GitHub y, con un Deploy Hook manual, Vercel lo publica como dos aplicaciones que usan las personas. Las aplicaciones leen y guardan en Supabase, que creó Claude.ai Chat. n8n se comunica con la aplicación y manda correos con Resend. La seguridad aplica a todo.">
+        <defs>
+          <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+        </defs>
+
+        <!-- Nodos -->
+        <g class="k-ia" transform="translate(265,30)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Claude Design</text><text class="ns" x="12" y="45">Propuso las pantallas</text><text class="ns" x="12" y="59">(entrega de diseño)</text></g>
+        <g class="k-rules" transform="translate(10,170)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Documentos de reglas</text><text class="ns" x="12" y="45">5 archivos en /docs</text><text class="ns" x="12" y="59">Gana el de número menor</text></g>
+        <g class="k-ia" transform="translate(265,170)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Claude Code Web</text><text class="ns" x="12" y="45">Escribió web y pwa</text><text class="ns" x="12" y="59">(Hitos 2, 3 y 4)</text></g>
+        <g class="k-host" transform="translate(520,170)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">GitHub</text><text class="ns" x="12" y="45">Guarda el código</text><text class="ns" x="12" y="59">Rama única gh-crm-123</text></g>
+        <g class="k-host" transform="translate(775,170)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Vercel</text><text class="ns" x="12" y="45">Publica las 2 apps</text><text class="ns" x="12" y="59">Guarda las variables secretas</text></g>
+        <g class="k-app" transform="translate(1030,170)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">web + pwa</text><text class="ns" x="12" y="45">web: trabajo diario</text><text class="ns" x="12" y="59">pwa: consulta del supervisor</text></g>
+        <g class="k-rules" transform="translate(1030,30)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Personas</text><text class="ns" x="12" y="45">10 vendedores, 2 supervisores</text><text class="ns" x="12" y="59">Entran con correo y contraseña</text></g>
+        <g class="k-auto" transform="translate(1030,310)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">n8n · WF-CRM123</text><text class="ns" x="12" y="45">Flujo del resumen</text><text class="ns" x="12" y="59">Lun a vie 7:30 o con botón</text></g>
+        <g class="k-auto" transform="translate(1030,450)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Resend</text><text class="ns" x="12" y="45">Envía los correos</text><text class="ns" x="12" y="59">(en modo de pruebas hoy)</text></g>
+        <g class="k-data" transform="translate(775,450)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Supabase · dbcrm123</text><text class="ns" x="12" y="45">Datos, usuarios y</text><text class="ns" x="12" y="59">permisos por fila (RLS)</text></g>
+        <g class="k-ia" transform="translate(10,450)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Claude.ai Chat</text><text class="ns" x="12" y="45">Creó la base de datos</text><text class="ns" x="12" y="59">(Hito 1)</text></g>
+
+        <!-- Conexiones -->
+        <line class="edge" x1="180" y1="206" x2="263" y2="206" marker-end="url(#a1)"/>
+        <text class="el" x="222" y="196" text-anchor="middle">guían a</text>
+
+        <line class="edge" x1="350" y1="102" x2="350" y2="168" marker-end="url(#a1)"/>
+        <text class="el" x="358" y="132">entrega el</text><text class="el" x="358" y="146">diseño</text>
+
+        <line class="edge" x1="435" y1="206" x2="518" y2="206" marker-end="url(#a1)"/>
+        <text class="el" x="477" y="196" text-anchor="middle">sube código</text>
+
+        <line class="edge" x1="690" y1="206" x2="773" y2="206" marker-end="url(#a1)"/>
+        <text class="el" x="732" y="196" text-anchor="middle">Deploy Hook</text><text class="el" x="732" y="224" text-anchor="middle">(a mano)</text>
+
+        <line class="edge" x1="945" y1="206" x2="1028" y2="206" marker-end="url(#a1)"/>
+        <text class="el" x="987" y="196" text-anchor="middle">sirve</text>
+
+        <line class="edge" x1="1115" y1="102" x2="1115" y2="168" marker-end="url(#a1)"/>
+        <text class="el" x="1123" y="140">usan</text>
+
+        <line class="edge" x1="860" y1="242" x2="860" y2="448" marker-start="url(#a1)" marker-end="url(#a1)"/>
+        <text class="el" x="852" y="324" text-anchor="end">lee y guarda</text><text class="el" x="852" y="338" text-anchor="end">con permisos (RLS)</text>
+
+        <path class="edge" d="M1030 346 H915 V244" marker-start="url(#a1)" marker-end="url(#a1)"/>
+        <text class="el" x="972" y="336" text-anchor="middle">se comunican</text><text class="el" x="972" y="362" text-anchor="middle">(solo por la API)</text>
+
+        <line class="edge" x1="1115" y1="382" x2="1115" y2="448" marker-end="url(#a1)"/>
+        <text class="el" x="1107" y="412" text-anchor="end">un correo</text><text class="el" x="1107" y="426" text-anchor="end">por persona</text>
+
+        <line class="edge" x1="180" y1="486" x2="773" y2="486" marker-end="url(#a1)"/>
+        <text class="el" x="477" y="476" text-anchor="middle">crea tablas y permisos con el conector de Supabase</text>
+
+        <path class="edge" d="M1200 486 H1226 V66 H1202" marker-end="url(#a1)"/>
+        <text class="el" transform="translate(1246 276) rotate(-90)" text-anchor="middle">llegan los correos</text>
+
+        <!-- Seguridad -->
+        <g class="k-sec" transform="translate(10,574)"><rect class="nd" width="1190" height="76" rx="10"/>
+          <text class="nt" x="16" y="26">Seguridad: aplica a todo lo anterior</text>
+          <text class="ns" x="16" y="46" style="font-size:12px">Base de datos: permisos por fila (RLS), nada se borra, el historial no se puede editar.</text>
+          <text class="ns" x="16" y="63" style="font-size:12px">Aplicación y n8n: las llaves viven solo en el servidor, el rol se lee de la tabla profiles y n8n entra únicamente por la API con un secreto.</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption>Lectura rápida: de izquierda a derecha se ve cómo nace el sistema (reglas, IA, código, publicación). De arriba hacia abajo se ve cómo lo usa la gente (personas, apps, datos y correos). Las líneas con punta en ambos extremos son conversaciones de ida y vuelta.</figcaption>
+    </figure>
+  </section>
+
+  <section id="herramientas">
+    <div class="sec-head">
+      <h2>Las herramientas, una por una</h2>
+      <p>Cada tarjeta responde tres preguntas: para qué sirve, qué hicimos con ella en el ejercicio y con quién se conecta.</p>
+    </div>
+    <div class="cards">
+
+      <article class="card c-rules">
+        <span class="tag">Reglas</span><h3>Documentos de reglas</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Son el contrato del proyecto. Dicen qué se construye, qué no se puede tocar y en qué orden. Si dos documentos se contradicen, gana el de número menor.</dd></div>
+          <div><dt>Orden de autoridad</dt><dd><code>SCRIPTS-SQL</code> (base de datos, intocable), <code>CLAUDE.md</code>, <code>TECHNICAL_SPEC</code>, <code>DESIGN_BRIEF</code>, <code>BUILD_PLAN</code>.</dd></div>
+          <div><dt>De dónde salieron</dt><dd>Los generó Claude.ai Chat en la fase 1 de la guía, con una entrevista por rondas.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Claude Code los leyó completos antes de escribir una línea y comprobó cada pantalla contra ellos.</dd></div>
+          <div><dt>Se conecta con</dt><dd>Claude Code Web (los sigue) y Supabase (SCRIPTS-SQL describe su estructura).</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> el reglamento de una obra. Nadie construye sin leerlo.</p>
+      </article>
+
+      <article class="card c-ia">
+        <span class="tag">IA que construyó</span><h3>Claude.ai Chat + conector de Supabase</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Conversar con la IA, redactar documentos de especificación y, con el conector, crear y revisar la base de datos directamente.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Según la guía, en la fase 1 generó los cinco documentos de reglas. Después, en otra conversación, el Hito 1: tablas, permisos, vistas y automatismos según SCRIPTS-SQL. Claude Code no la modificó, solo la consultó en lectura.</dd></div>
+          <div><dt>Se conecta con</dt><dd>Supabase.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> el arquitecto que levanta los cimientos.</p>
+      </article>
+
+      <article class="card c-ia">
+        <span class="tag">IA que construyó</span><h3>Claude Design</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Proponer cómo se ven y se comportan las pantallas antes de programarlas.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Entregó el diseño de las pantallas de escritorio y de la PWA, junto con el README.handoff para Claude Code Web. Se decidieron recortes: el comparativo, las gráficas y el orden por columnas quedaron fuera del MVP.</dd></div>
+          <div><dt>Se conecta con</dt><dd>Claude Code Web, que lo convierte en código.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> los planos de interiorismo.</p>
+      </article>
+
+      <article class="card c-ia">
+        <span class="tag">IA que construyó</span><h3>Claude Code Web</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Una IA que escribe, prueba y corrige código en un entorno en la nube.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Construyó <code>web</code> y <code>pwa</code> en los Hitos 2, 3 y 4. Corrió revisión de estilo, tipos, compilación, pruebas automáticas y <code>check:security</code>. Validó con la base en solo lectura.</dd></div>
+          <div><dt>Se conecta con</dt><dd>Los documentos (los sigue), GitHub (sube el código) y Supabase (lee para validar). No despliega.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> el contratista que construye y revisa. Tú autorizas cada etapa.</p>
+      </article>
+
+      <article class="card c-host">
+        <span class="tag">Código y publicación</span><h3>GitHub</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Guardar el código con la historia de cada cambio, para poder volver atrás y saber quién cambió qué.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Repositorio <code>gh-crm-123</code> con una sola rama y commits pequeños en español.</dd></div>
+          <div><dt>Se conecta con</dt><dd>Recibe el código de Claude Code. Vercel lo lee desde ahí.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> un archivero con memoria perfecta.</p>
+        <p class="todo">Pendiente: ponerlo en privado.</p>
+      </article>
+
+      <article class="card c-host">
+        <span class="tag">Código y publicación</span><h3>Vercel</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Publicar las aplicaciones en internet y guardar sus variables secretas.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Dos proyectos (<code>crm-123-web</code> y <code>crm-123-pwa</code>), con despliegue manual mediante Deploy Hook.</dd></div>
+          <div><dt>Se conecta con</dt><dd>GitHub (de ahí toma el código), Supabase (las apps le hablan) y n8n (que llama a la PWA).</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> el escaparate que muestra el sistema al público.</p>
+      </article>
+
+      <article class="card c-app">
+        <span class="tag">Aplicaciones</span><h3>web y pwa</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd><b>web</b>: el trabajo diario de vendedores y supervisores (clientes, oportunidades, pólizas, cobranza, siniestros, comisiones, administración). <b>pwa</b>: consulta rápida del supervisor desde el celular (panel, vendedores, buscar y reasignar, resumen).</dd></div>
+          <div><dt>Con qué están hechas</dt><dd>Next.js y React (pantallas y servidor), TypeScript (detecta errores antes de ejecutar), Tailwind (estilo), Zod (valida formularios) y Vitest (pruebas).</dd></div>
+          <div><dt>Se conecta con</dt><dd>Supabase para los datos y, solo la pwa, con n8n para el resumen.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> dos ventanillas distintas hacia la misma bodega.</p>
+      </article>
+
+      <article class="card c-data">
+        <span class="tag">Datos</span><h3>Supabase · dbcrm123</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Guarda los datos, controla el inicio de sesión y decide quién puede ver o cambiar cada fila (RLS).</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Perfiles de Vendedor y Supervisor, clientes, oportunidades, pólizas, recibos, siniestros, comisiones, metas y un historial. Al emitir una póliza se crean solos sus recibos y comisiones.</dd></div>
+          <div><dt>Se conecta con</dt><dd>web y pwa (con la sesión de cada persona). Solo unas rutas del servidor usan la llave maestra.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> una bodega con guardias que revisan tu credencial en cada estante.</p>
+      </article>
+
+      <article class="card c-auto">
+        <span class="tag">Automatización</span><h3>n8n</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Automatizar tareas con flujos visuales, sin escribir código.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>El flujo <code>WF-CRM123</code> (12 nodos): dos disparadores (reloj de lunes a viernes 7:30 y botón Enviar ahora), pedir datos, armar un correo por persona, enviar y reportar el resultado.</dd></div>
+          <div><dt>Se conecta con</dt><dd>La pwa por API y Resend para el correo. Nunca toca la base de datos.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> un asistente que sigue una receta a la hora indicada.</p>
+        <p class="todo">Pendiente: la prueba gratuita termina en días; se requiere un plan.</p>
+      </article>
+
+      <article class="card c-auto">
+        <span class="tag">Automatización</span><h3>Resend</h3>
+        <dl>
+          <div><dt>Para qué sirve</dt><dd>Enviar correos desde una aplicación y confirmar si salieron.</dd></div>
+          <div><dt>Qué hicimos</dt><dd>Remitente <code>onboarding@resend.dev</code> y modo de pruebas: todos los correos llegan a una sola cuenta con el asunto <code>[Para: Nombre]</code>.</dd></div>
+          <div><dt>Se conecta con</dt><dd>n8n, que le pide un correo por persona.</dd></div>
+        </dl>
+        <p class="analogy"><b>Piénsalo así:</b> el cartero.</p>
+        <p class="todo">Pendiente: dominio propio y apagar el modo de pruebas.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="flujos">
+    <div class="sec-head">
+      <h2>Cómo fluye todo</h2>
+      <p>Dos recorridos que conviene entender bien: cómo el código llega a internet y qué pasa, paso a paso, cuando se manda el resumen.</p>
+    </div>
+
+    <h3>A. Del código a la aplicación en línea</h3>
+    <figure>
+      <span class="hint">Desliza hacia los lados para ver el dibujo completo.</span>
+      <div class="fig-scroll">
+      <svg viewBox="0 0 960 250" role="img" aria-label="Claude Code Web sube el código a GitHub, la persona abre el Deploy Hook, Vercel compila con las variables de entorno y publica la aplicación en línea.">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g class="k-ia" transform="translate(10,20)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Claude Code Web</text><text class="ns" x="12" y="45">Escribe y prueba</text><text class="ns" x="12" y="59">el código</text></g>
+        <g class="k-host" transform="translate(260,20)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">GitHub</text><text class="ns" x="12" y="45">Rama gh-crm-123</text><text class="ns" x="12" y="59">Un commit por avance</text></g>
+        <g class="k-host" transform="translate(510,20)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Vercel compila</text><text class="ns" x="12" y="45">Un proyecto por app</text><text class="ns" x="12" y="59">Debe terminar en Ready</text></g>
+        <g class="k-app" transform="translate(760,20)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">App en línea</text><text class="ns" x="12" y="45">crm-123-web</text><text class="ns" x="12" y="59">crm-123-pwa</text></g>
+        <g class="k-sec" transform="translate(510,150)"><rect class="nd" width="170" height="72" rx="10"/><text class="nt" x="12" y="26">Variables de entorno</text><text class="ns" x="12" y="45">Llaves y direcciones</text><text class="ns" x="12" y="59">Deben existir antes</text></g>
+
+        <line class="edge" x1="180" y1="56" x2="258" y2="56" marker-end="url(#a2)"/>
+        <text class="el" x="219" y="46" text-anchor="middle">git push</text><text class="el" x="219" y="74" text-anchor="middle">código nuevo</text>
+        <line class="edge" x1="430" y1="56" x2="508" y2="56" marker-end="url(#a2)"/>
+        <text class="el" x="469" y="46" text-anchor="middle">Deploy Hook</text><text class="el" x="469" y="74" text-anchor="middle">(tú, a mano)</text>
+        <line class="edge" x1="680" y1="56" x2="758" y2="56" marker-end="url(#a2)"/>
+        <text class="el" x="719" y="46" text-anchor="middle">Ready</text><text class="el" x="719" y="74" text-anchor="middle">publicado</text>
+        <line class="edge" x1="595" y1="150" x2="595" y2="94" marker-end="url(#a2)"/>
+        <text class="el" x="603" y="126">se leen al compilar</text>
+      </svg>
+      </div>
+      <figcaption>La publicación es manual a propósito: nada sale a producción sin que una persona abra el Deploy Hook.</figcaption>
+    </figure>
+    <div class="note"><b>Trampa frecuente:</b> el botón Redeploy de Vercel reutiliza el código anterior. Sirve solo cuando cambiaste variables de entorno. Para publicar código nuevo hay que abrir el Deploy Hook. Y cualquier variable nueva solo se aplica en un despliegue nuevo.</div>
+
+    <h3>B. El resumen de las 7:30, paso a paso</h3>
+    <figure>
+      <span class="hint">Desliza hacia los lados para ver el dibujo completo.</span>
+      <div class="fig-scroll">
+      <svg viewBox="0 0 1150 640" role="img" aria-label="Secuencia del resumen: el supervisor pulsa Enviar ahora, la PWA anota la solicitud y avisa a n8n con el secreto 1, n8n pide los datos con el secreto 2, la PWA lee a Supabase y devuelve destinatarios, n8n pide los correos a Resend, los correos llegan a las bandejas, n8n reporta el resultado, la PWA lo guarda y lo muestra al supervisor.">
+        <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g class="k-rules" transform="translate(25,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">Supervisor</text><text class="ns" x="75" y="42" text-anchor="middle">en la PWA</text></g>
+        <line class="life" x1="100" y1="68" x2="100" y2="612"/>
+        <g class="k-app" transform="translate(215,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">PWA</text><text class="ns" x="75" y="42" text-anchor="middle">crm-123-pwa en Vercel</text></g>
+        <line class="life" x1="290" y1="68" x2="290" y2="612"/>
+        <g class="k-data" transform="translate(405,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">Supabase</text><text class="ns" x="75" y="42" text-anchor="middle">base dbcrm123</text></g>
+        <line class="life" x1="480" y1="68" x2="480" y2="612"/>
+        <g class="k-auto" transform="translate(595,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">n8n</text><text class="ns" x="75" y="42" text-anchor="middle">flujo WF-CRM123</text></g>
+        <line class="life" x1="670" y1="68" x2="670" y2="612"/>
+        <g class="k-auto" transform="translate(785,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">Resend</text><text class="ns" x="75" y="42" text-anchor="middle">servicio de correo</text></g>
+        <line class="life" x1="860" y1="68" x2="860" y2="612"/>
+        <g class="k-rules" transform="translate(975,10)"><rect class="nd" width="150" height="56" rx="10"/><text class="nt" x="75" y="24" text-anchor="middle">Correos</text><text class="ns" x="75" y="42" text-anchor="middle">bandeja de cada quien</text></g>
+        <line class="life" x1="1050" y1="68" x2="1050" y2="612"/>
+        <line class="edge" x1="128" y1="112" x2="284" y2="112" marker-end="url(#a3)"/>
+        <circle class="badge" cx="118" cy="112" r="10"/><text class="badge-t" x="118" y="115.5">1</text>
+        <text class="el" x="206.0" y="104" text-anchor="middle">Enviar ahora</text>
+        <line class="edge" x1="318" y1="158" x2="474" y2="158" marker-end="url(#a3)"/>
+        <circle class="badge" cx="308" cy="158" r="10"/><text class="badge-t" x="308" y="161.5">2</text>
+        <text class="el" x="396.0" y="150" text-anchor="middle">anota la solicitud</text>
+        <line class="edge" x1="318" y1="204" x2="664" y2="204" marker-end="url(#a3)"/>
+        <circle class="badge" cx="308" cy="204" r="10"/><text class="badge-t" x="308" y="207.5">3</text>
+        <text class="el" x="491.0" y="196" text-anchor="middle">avisa que arranque · secreto 1</text>
+        <line class="edge" x1="642" y1="250" x2="296" y2="250" marker-end="url(#a3)"/>
+        <circle class="badge" cx="652" cy="250" r="10"/><text class="badge-t" x="652" y="253.5">4</text>
+        <text class="el" x="469.0" y="242" text-anchor="middle">pide los datos del día · secreto 2</text>
+        <line class="edge" x1="318" y1="296" x2="474" y2="296" marker-end="url(#a3)"/>
+        <circle class="badge" cx="308" cy="296" r="10"/><text class="badge-t" x="308" y="299.5">5</text>
+        <text class="el" x="396.0" y="288" text-anchor="middle">lee los pendientes</text>
+        <line class="edge" x1="318" y1="342" x2="664" y2="342" marker-end="url(#a3)"/>
+        <circle class="badge" cx="308" cy="342" r="10"/><text class="badge-t" x="308" y="345.5">6</text>
+        <text class="el" x="491.0" y="334" text-anchor="middle">entrega destinatarios y contenido</text>
+        <line class="edge" x1="698" y1="388" x2="854" y2="388" marker-end="url(#a3)"/>
+        <circle class="badge" cx="688" cy="388" r="10"/><text class="badge-t" x="688" y="391.5">7</text>
+        <text class="el" x="776.0" y="380" text-anchor="middle">un correo por persona</text>
+        <line class="edge" x1="888" y1="434" x2="1044" y2="434" marker-end="url(#a3)"/>
+        <circle class="badge" cx="878" cy="434" r="10"/><text class="badge-t" x="878" y="437.5">8</text>
+        <text class="el" x="966.0" y="426" text-anchor="middle">entrega los correos</text>
+        <line class="edge" x1="642" y1="480" x2="296" y2="480" marker-end="url(#a3)"/>
+        <circle class="badge" cx="652" cy="480" r="10"/><text class="badge-t" x="652" y="483.5">9</text>
+        <text class="el" x="469.0" y="472" text-anchor="middle">reporta el resultado · secreto 2</text>
+        <line class="edge" x1="318" y1="526" x2="474" y2="526" marker-end="url(#a3)"/>
+        <circle class="badge" cx="308" cy="526" r="10"/><text class="badge-t" x="308" y="529.5">10</text>
+        <text class="el" x="396.0" y="518" text-anchor="middle">guarda el resultado</text>
+        <line class="edge" x1="262" y1="572" x2="106" y2="572" marker-end="url(#a3)"/>
+        <circle class="badge" cx="272" cy="572" r="10"/><text class="badge-t" x="272" y="575.5">11</text>
+        <text class="el" x="184.0" y="564" text-anchor="middle">muestra el resultado</text>
+      </svg>
+      </div>
+      <figcaption>Los números marcan el orden real. Los dos secretos son llaves distintas: el secreto 1 protege el aviso de la PWA hacia n8n y el secreto 2 protege las peticiones de n8n hacia la PWA.</figcaption>
+    </figure>
+    <ol class="phases" aria-label="Fases del recorrido">
+      <li><b>Pasos 1 a 3, arranque:</b> alguien pulsa el botón y la aplicación avisa a n8n.</li>
+      <li><b>Pasos 4 a 6, recolección:</b> n8n pide los datos y la aplicación los busca en la base.</li>
+      <li><b>Pasos 7 y 8, envío:</b> n8n pide a Resend un correo por persona.</li>
+      <li><b>Pasos 9 a 11, cierre:</b> n8n reporta, la aplicación guarda el resultado y lo muestra.</li>
+    </ol>
+    <div class="note"><b>Cuando lo dispara el reloj de las 7:30</b> no hay supervisor ni botón: n8n arranca solo en el paso 4. Si el interruptor de envío automático está apagado, la aplicación responde "omitido" y el flujo termina sin mandar nada.</div>
+  </section>
+
+  <section id="seguridad">
+    <div class="sec-head">
+      <h2>Seguridad en capas</h2>
+      <p>Principio central: la interfaz oculta lo que no te toca, pero la seguridad real está en la base de datos. Aunque alguien manipule la pantalla, la base no le entrega lo que no es suyo.</p>
+    </div>
+    <div class="cards">
+      <article class="card c-sec">
+        <span class="tag">Capa 1</span><h3>Base de datos</h3>
+        <dl>
+          <div><dt>Qué hay</dt><dd>Permisos por fila (RLS) en todas las tablas. No existe borrado físico: se archiva. El historial y las actividades solo admiten altas. Las vistas respetan los permisos de quien consulta.</dd></div>
+          <div><dt>Qué evita</dt><dd>Que un vendedor vea a los clientes de otro, se quede con una oportunidad ajena o borre rastro.</dd></div>
+        </dl>
+      </article>
+      <article class="card c-sec">
+        <span class="tag">Capa 2</span><h3>Aplicación</h3>
+        <dl>
+          <div><dt>Qué hay</dt><dd>La llave maestra vive solo en el servidor y solo en rutas autorizadas. La persona se identifica con <code>getUser()</code> y su rol se lee de la tabla <code>profiles</code>, nunca de algo que mande el navegador. Los secretos se comparan en tiempo constante.</dd></div>
+          <div><dt>Qué evita</dt><dd>Que una llave se filtre al navegador o que alguien se haga pasar por supervisor.</dd></div>
+        </dl>
+      </article>
+      <article class="card c-sec">
+        <span class="tag">Capa 3</span><h3>Integraciones</h3>
+        <dl>
+          <div><dt>Qué hay</dt><dd>n8n nunca toca la base: solo usa la API de la aplicación con su propio secreto. Ningún secreto se guarda en GitHub ni en los registros. El envío manual tiene espera de 120 segundos y cada solicitud se usa una sola vez.</dd></div>
+          <div><dt>Qué evita</dt><dd>Envíos duplicados, llamadas falsas al flujo y fugas por registros o capturas.</dd></div>
+        </dl>
+      </article>
+      <article class="card c-sec">
+        <span class="tag">Capa 4</span><h3>Proceso de trabajo</h3>
+        <dl>
+          <div><dt>Qué hay</dt><dd>Un hito a la vez, con confirmación escrita antes de avanzar. Una prueba automática de seguridad (<code>check:security</code>) corre en cada cierre. La IA no modifica la base de datos.</dd></div>
+          <div><dt>Qué evita</dt><dd>Que el error de una etapa se arrastre a la siguiente o que una "mejora" rompa una regla sin que nadie lo note.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section id="hitos">
+    <div class="sec-head">
+      <h2>Los cuatro hitos</h2>
+      <p>El proyecto se construyó por etapas. Ninguna empezó sin la confirmación escrita de la etapa anterior.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n"></span><h3>La base de datos</h3><p>Tablas, permisos, vistas y automatismos según SCRIPTS-SQL.</p><span class="who">Hecho por Claude.ai Chat con el conector de Supabase</span></div>
+      <div class="step"><span class="n"></span><h3>Entrar y moverse</h3><p>Inicio de sesión, roles, menú de navegación y tablero del día, en las dos apps, y primer despliegue.</p><span class="who">Claude Code Web · probado por ti</span></div>
+      <div class="step"><span class="n"></span><h3>El trabajo diario</h3><p>Clientes, oportunidades, pólizas, cobranza, siniestros y comisiones, con las reglas de negocio.</p><span class="who">Claude Code Web · probado por ti</span></div>
+      <div class="step"><span class="n"></span><h3>Supervisión y resumen</h3><p>Panel y detalle de vendedores en la PWA, buscar y reasignar, metas e historial, y el resumen de las 7:30 con n8n y Resend.</p><span class="who">Claude Code Web · probado por ti, 11 pruebas</span></div>
+    </div>
+    <div class="note" style="margin-top:14px"><b>Entregable final:</b> el manual de usuario (<code>docs/MANUAL-DE-USUARIO.md</code> y su versión en PDF), que cierra el último paso de la guía.</div>
+  </section>
+
+  <section id="lecciones">
+    <div class="sec-head">
+      <h2>Lo que nos enseñaron los tropiezos</h2>
+      <p>Los errores del ejercicio fueron la mejor parte de la clase. Cada uno deja una regla práctica.</p>
+    </div>
+    <div class="lessons">
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>El primer despliegue falló por no tener las variables de entorno.</div><div><span class="k good">Qué aprendimos</span>Las variables deben existir antes de compilar. La app falla a propósito si faltan, para no arrancar a medias.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>Un cambio ya subido a GitHub no aparecía en línea.</div><div><span class="k good">Qué aprendimos</span>Redeploy reutiliza el código viejo. Para código nuevo se usa el Deploy Hook.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>El envío falló con "n8n respondió 403".</div><div><span class="k good">Qué aprendimos</span>Un 403 o 401 casi siempre es un secreto que no coincide entre dos sistemas. Hay dos secretos distintos y cada uno va en su propio lugar.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>El flujo salió en verde pero no mandó ningún correo.</div><div><span class="k good">Qué aprendimos</span>Verde no es sinónimo de funcionó. Hay que abrir la salida de cada nodo y comprobar el resultado real.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>La propia aplicación mandaba a n8n a la pantalla de inicio de sesión.</div><div><span class="k good">Qué aprendimos</span>Las rutas que usa un robot se protegen con un secreto, no con una sesión de persona. Una prueba real lo reveló.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>Una llave secreta se vio en una captura de pantalla.</div><div><span class="k good">Qué aprendimos</span>Una captura también es una fuga. Los secretos se marcan como secretos y se tapan al compartir.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>Una variable escrita como "True" con mayúscula dejó el modo de pruebas inválido.</div><div><span class="k good">Qué aprendimos</span>Los valores de configuración se escriben exactos, y la app avisa cuál variable falta sin mostrar su valor.</div></div>
+      <div class="lesson"><div><span class="k bad">Qué pasó</span>Se avanzó de etapa sin tener los resultados reales de las pruebas.</div><div><span class="k good">Qué aprendimos</span>Cada hito se cierra con pruebas hechas y confirmadas, no con suposiciones. Mejor validar directo en la base cuando se puede.</div></div>
+    </div>
+  </section>
+
+  <section id="glosario">
+    <div class="sec-head">
+      <h2>Glosario rápido</h2>
+      <p>Las palabras técnicas que aparecieron, en lenguaje de todos los días.</p>
+    </div>
+    <dl class="gloss">
+      <div><dt>RLS (permisos por fila)</dt><dd>Regla de la base que decide, fila por fila, quién puede ver o cambiar un dato.</dd></div>
+      <div><dt>API</dt><dd>La ventanilla por la que un programa le pide cosas a otro.</dd></div>
+      <div><dt>Webhook</dt><dd>Una dirección que, al recibir un aviso, pone en marcha un flujo.</dd></div>
+      <div><dt>Variable de entorno</dt><dd>Un dato de configuración guardado fuera del código, como una llave o una dirección.</dd></div>
+      <div><dt>Secreto</dt><dd>Una variable que no debe verse ni compartirse, como una contraseña.</dd></div>
+      <div><dt>Deploy Hook</dt><dd>Un enlace que, al abrirlo, ordena a Vercel publicar la última versión.</dd></div>
+      <div><dt>PWA</dt><dd>Un sitio web que se instala en el celular y se usa como aplicación.</dd></div>
+      <div><dt>Hito</dt><dd>Una etapa del proyecto que se prueba y se confirma antes de seguir.</dd></div>
+      <div><dt>Historial (audit log)</dt><dd>Un registro donde solo se agregan líneas. Nadie puede editarlo ni borrarlo.</dd></div>
+      <div><dt>Modo de pruebas</dt><dd>Un interruptor que manda todos los correos a una sola cuenta para no molestar a nadie.</dd></div>
+    </dl>
+    <div class="sec-head" style="margin-top:8px">
+      <h3>Lo que sigue para uso real</h3>
+    </div>
+    <ul class="next">
+      <li>Plan de n8n</li>
+      <li>Dominio propio en Resend</li>
+      <li>Apagar el modo de pruebas</li>
+      <li>Crear los usuarios reales</li>
+      <li>Repositorio en privado</li>
+      <li>Rotar la llave secreta</li>
+    </ul>
+  </section>
+
+  <footer>Mapa elaborado a partir del ejercicio CRM-123. Los datos y nombres de las pruebas son ficticios.</footer>
+</div>
+
+</html>
